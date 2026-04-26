@@ -1,0 +1,86 @@
+import time
+import datetime
+import base64
+import synth.wssClient as wssClient
+import json
+import synth.commands as commands
+import requests
+
+class bot:
+    def __init__(self, token):
+        self.botToken = token
+        #self.logFile = open(f"{}.log", "a")
+        #self.logFile.write(encrypt_string_with_public_key("Logging start", self.logPublicKey) + "\n")
+        self.config = {}
+        self.stats = {"allTime":{"messages": 0, "messagesFromMembers":{}}}
+        self.websocket = wssClient.WSSClient(f"wss://stoat.chat/events?version=1&format=json&token={self.botToken}")
+        self.commandExecutor = commands.commandExecutor(self)
+        self.backupScheduleSeconds = 60 * 30
+        self.lastBackup = time.time() + self.backupScheduleSeconds
+        self.userNameLookUpTable = {}
+        self.autoResponseBeginns = {"hai","hello","hallo", "hey"}
+        self.ready()
+    
+    def ready(self):
+        self.loadStats()
+        init = True
+        while init:
+            if self.websocket.has_new_data():
+                for packet in self.websocket.get_messages():
+                    packet = json.loads(packet)
+                    if packet["type"] == "Ready":
+                        print(packet)
+                        init = False
+        self.mainLoop()
+    
+    def mainLoop(self):
+        loop = True
+        while loop:
+            time.sleep(0.1)
+            if time.time() > self.lastBackup:
+                self.lastBackup = time.time() + self.backupScheduleSeconds
+                with open("stats.json", "w", encoding="utf-8") as f:
+                    json.dump(self.stats, f, ensure_ascii=False, indent=4)
+            if self.websocket.has_new_data():
+                for packet in self.websocket.get_messages():
+                    packet = json.loads(packet)
+                    print(packet)
+                    if packet["type"] == "Message" and "content" in packet:
+                        message: str = packet["content"].strip()
+                        words = message.split(" ")
+                        if len(words) == 1 and words[0].lower() in self.autoResponseBeginns:
+                            self.replyToMessage(packet["channel"], f"{words[0]} <@{packet['author']}>", packet["_id"])
+                        if message[0] == "/":
+                            self.commandExecutor.execute(packet)
+                        else:
+                            self.stats["allTime"]['messages'] += 1
+                            if packet["author"] in self.stats["allTime"]["messagesFromMembers"]:
+                                self.stats["allTime"]["messagesFromMembers"][packet["author"]] += 1
+                            else:
+                                self.stats["allTime"]["messagesFromMembers"][packet["author"]] = 1
+                            
+    
+    def sendMessage(self, channel: str, message: str):
+        requests.post(f"https://stoat.chat/api/channels/{channel}/messages?", headers={"X-Bot-Token": self.botToken}, json={"content": message})
+    
+    def replyToMessage(self, channel: str, message: str, replyTo: str):
+        requests.post(f"https://stoat.chat/api/channels/{channel}/messages?", headers={"X-Bot-Token": self.botToken}, json={"content": message,"replies":[{"id":replyTo,"mention":True}]})
+    
+    def lookUpUserName(self, userID: str):
+        try:
+            return self.userNameLookUpTable[userID]
+        except KeyError:
+            resp = requests.get(f"https://stoat.chat/api/users/{userID}", headers={"X-Bot-Token": self.botToken})
+            if resp.ok:
+                resp = resp.json()
+                self.userNameLookUpTable[userID] = resp["username"]
+                return self.userNameLookUpTable[userID]
+            return None
+    
+    def loadStats(self):
+        stats = {}
+        try:
+            with open("stats.json", "r", encoding="utf-8") as f:
+               stats = json.load(f) or {}
+            self.stats['allTime'] = stats["allTime"]
+        except: pass
