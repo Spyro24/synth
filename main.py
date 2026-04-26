@@ -48,8 +48,8 @@ class bot:
                     if packet["type"] == "Message" and "content" in packet:
                         message: str = packet["content"].strip()
                         words = message.split(" ")
-                        if len(words) == 1 and words[0].lower() in self.autoResponseBeginns:
-                            self.replyToMessage(packet["channel"], f"{words[0]} <@{packet['author']}>", packet["_id"])
+                        #if len(words) == 1 and words[0].lower() in self.autoResponseBeginns:
+                        #    self.replyToMessage(packet["channel"], f"{words[0]} <@{packet['author']}>", packet["_id"])
                         if message[0] == "/":
                             self.commandExecutor.execute(packet)
                         else:
