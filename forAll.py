@@ -7,7 +7,7 @@ def stats(args, bot, params: dict, helpStr=False):
         sendString = "> ### Server Stats\n"
         if len(args) == 0:
             top10 = sorted(bot.stats['allTime']['messagesFromMembers'].items(), key=lambda kv: kv[1], reverse=True)[:10]
-            sendString += f"> Nachrichten: `{bot.stats['allTime']['messages']}`\n> \n> \n"
+            sendString += f"> Nachrichten: `{bot.stats['allTime']['messages']}    Regestred Users: `{len(bot.stats['allTime']['messagesFromMembers'].keys())}`\n> \n> \n"
             sendString += f"> **Top Ten Members**\n"
             n = 1
             print(top10)
