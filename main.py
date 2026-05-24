@@ -18,7 +18,7 @@ class bot:
         self.commandExecutor = commands.commandExecutor(self)
         self.backupScheduleSeconds = 60 * 30
         self.lastBackup = time.time() + self.backupScheduleSeconds
-        self.nextPing = time.time() + 10
+        self.nextPing = 0
         self.userNameLookUpTable = {}
         self.autoResponseBeginns = {"hai","hello","hallo", "hey"}
         self.ready()
