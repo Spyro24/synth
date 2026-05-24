@@ -8,6 +8,7 @@ import requests
 
 class bot:
     def __init__(self, token):
+        self.log("Starting Bot")
         self.botToken = token
         #self.logFile = open(f"{}.log", "a")
         #self.logFile.write(encrypt_string_with_public_key("Logging start", self.logPublicKey) + "\n")
@@ -17,19 +18,23 @@ class bot:
         self.commandExecutor = commands.commandExecutor(self)
         self.backupScheduleSeconds = 60 * 30
         self.lastBackup = time.time() + self.backupScheduleSeconds
+        self.nextPing = time.time() + 10
         self.userNameLookUpTable = {}
         self.autoResponseBeginns = {"hai","hello","hallo", "hey"}
         self.ready()
     
     def ready(self):
+        self.log("Restoring Stats")
         self.loadStats()
+        self.log("Stats restored")
+        self.log("Login")
         init = True
         while init:
             if self.websocket.has_new_data():
                 for packet in self.websocket.get_messages():
                     packet = json.loads(packet)
                     if packet["type"] == "Ready":
-                        print(packet)
+                        self.log("Loged In")
                         init = False
         self.mainLoop()
     
@@ -39,6 +44,7 @@ class bot:
             time.sleep(0.1)
             if time.time() > self.lastBackup:
                 self.lastBackup = time.time() + self.backupScheduleSeconds
+                log("Saving Stats")
                 with open("stats.json", "w", encoding="utf-8") as f:
                     json.dump(self.stats, f, ensure_ascii=False, indent=4)
             if self.websocket.has_new_data():
@@ -51,6 +57,7 @@ class bot:
                         #if len(words) == 1 and words[0].lower() in self.autoResponseBeginns:
                         #    self.replyToMessage(packet["channel"], f"{words[0]} <@{packet['author']}>", packet["_id"])
                         if message[0] == "/":
+                            self.log(f"{packet['author']} used '{message}'")
                             self.commandExecutor.execute(packet)
                         else:
                             self.stats["allTime"]['messages'] += 1
@@ -58,6 +65,9 @@ class bot:
                                 self.stats["allTime"]["messagesFromMembers"][packet["author"]] += 1
                             else:
                                 self.stats["allTime"]["messagesFromMembers"][packet["author"]] = 1
+            if self.nextPing < time.time():
+                self.websocket.send_data('{"type":"Ping","data":' + str(time.time()) + '}')
+                self.nextPing = time.time() + 10
                             
     
     def sendMessage(self, channel: str, message: str):
@@ -84,3 +94,7 @@ class bot:
                stats = json.load(f) or {}
             self.stats['allTime'] = stats["allTime"]
         except: pass
+    
+    def log(self, msg):
+        logTime = time.gmtime()
+        print(f"[{logTime[0]}-{logTime[1]}-{logTime[2]} {logTime[3]}:{logTime[4]}:{logTime[5]}] {msg}")
