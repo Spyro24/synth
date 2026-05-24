@@ -50,7 +50,6 @@ class bot:
             if self.websocket.has_new_data():
                 for packet in self.websocket.get_messages():
                     packet = json.loads(packet)
-                    print(packet)
                     if packet["type"] == "Message" and "content" in packet:
                         message: str = packet["content"].strip()
                         words = message.split(" ")
