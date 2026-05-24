@@ -10,7 +10,6 @@ def stats(args, bot, params: dict, helpStr=False):
             sendString += f"> Nachrichten: `{bot.stats['allTime']['messages']}`    Registred Users: `{len(bot.stats['allTime']['messagesFromMembers'].keys())}`\n> \n> \n"
             sendString += f"> **Top Ten Members**\n"
             n = 1
-            print(top10)
             for entry in top10:
                 sendString += f">`{bot.lookUpUserName(entry[0])}` has a score of `{entry[1]}`\n"
                 n += 1
