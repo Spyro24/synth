@@ -44,7 +44,7 @@ class bot:
             time.sleep(0.1)
             if time.time() > self.lastBackup:
                 self.lastBackup = time.time() + self.backupScheduleSeconds
-                log("Saving Stats")
+                self.log("Saving Stats")
                 with open("stats.json", "w", encoding="utf-8") as f:
                     json.dump(self.stats, f, ensure_ascii=False, indent=4)
             if self.websocket.has_new_data():
