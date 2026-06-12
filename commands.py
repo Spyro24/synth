@@ -5,7 +5,8 @@ class commandExecutor:
         self.bot = bot
         self.commandTable = {"stats": forAll.stats,
                              "help": forAll.chelp,
-                             "dice": forAll.dice}
+                             "dice": forAll.dice,
+                             "bump": forAll.cbump}
     
     def execute(self, packet):
         command: str = packet["content"].strip().strip("/").split(" ")
