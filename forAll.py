@@ -26,13 +26,6 @@ def chelp(args, bot, params: dict, helpStr=False):
         sendString += "> " + bot.commandExecutor.commandTable[command](None, None, None, helpStr=True) + "\n"
     bot.sendMessage(params["channel"], sendString)
 
-def cbump(args, bot, params: dict, helpStr=False):
-    if helpStr:
-        return "`/bump` - sendet den bump befehl für jede Platform"
-    
-    sendString = "!bump"
-    bot.sendMessage(params["channel"], sendString)
-
 def dice(args, bot, params: dict, helpStr=False):
     if helpStr:
         return "`/dice [min] [max]` - Würf einen kleinen würfel mit den werten von `min` bis `max`"
