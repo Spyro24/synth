@@ -59,7 +59,7 @@ class bot:
                         words = message.split(" ")
                         #if len(words) == 1 and words[0].lower() in self.autoResponseBeginns:
                         #    self.replyToMessage(packet["channel"], f"{words[0]} <@{packet['author']}>", packet["_id"])
-                        if message[0] == "/":
+                        if len(message) > 0 and message[0] == "/":
                             self.log(f"{packet['author']} used '{message}'")
                             self.commandExecutor.execute(packet)
                         elif any(n in message for n in ("@​everyone", "@everyone")):
