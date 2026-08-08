@@ -8,6 +8,7 @@ import requests
 
 class bot:
     def __init__(self, token):
+        self.logChannel = "01KHDS86KVYX5KDWY6HEG730VY"
         self.log("Starting Bot")
         self.botToken = token
         #self.logFile = open(f"{}.log", "a")
@@ -22,7 +23,6 @@ class bot:
         self.userNameLookUpTable = {}
         self.autoResponseBeginns = {"hai","hello","hallo", "hey"}
         self.channelToServerResolve = dict()
-        self.logChannel = "01KHDS86KVYX5KDWY6HEG730VY"
         self.ready()
     
     def ready(self):
