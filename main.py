@@ -9,8 +9,8 @@ import requests
 class bot:
     def __init__(self, token):
         self.logChannel = "01KHDS86KVYX5KDWY6HEG730VY"
-        self.log("Starting Bot")
         self.botToken = token
+        self.log("Starting Bot")
         #self.logFile = open(f"{}.log", "a")
         #self.logFile.write(encrypt_string_with_public_key("Logging start", self.logPublicKey) + "\n")
         self.config = {}
