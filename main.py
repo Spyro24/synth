@@ -22,6 +22,7 @@ class bot:
         self.userNameLookUpTable = {}
         self.autoResponseBeginns = {"hai","hello","hallo", "hey"}
         self.channelToServerResolve = dict()
+        self.logChannel = "01KHDS86KVYX5KDWY6HEG730VY"
         self.ready()
     
     def ready(self):
@@ -53,6 +54,7 @@ class bot:
                     json.dump(self.stats, f, ensure_ascii=False, indent=4)
             if self.websocket.has_new_data():
                 for packet in self.websocket.get_messages():
+                    continueFlag = False
                     packet = json.loads(packet)
                     if packet["type"] == "Message" and "content" in packet:
                         message: str = packet["content"].strip()
@@ -63,6 +65,10 @@ class bot:
                             if word.startswith("<@") and word.endswith(">"):
                                 if (not packet["author"] in self.stats["allTime"]["messagesFromMembers"]) or self.stats["allTime"]["messagesFromMembers"][packet["author"]] < 5:
                                     self.kickUser(packet["author"], self.channelToServerResolve[packet["channel"]])
+                                    self.log(f"user <@{packet['author']}> auto kicked, prob a bot user, message: `{message}`")
+                                    continueFlag = True
+                        if continueFlag:
+                            continue 
                         if len(message) > 0 and message[0] == "/":
                             self.log(f"{packet['author']} used '{message}'")
                             self.commandExecutor.execute(packet)
@@ -113,4 +119,6 @@ class bot:
     
     def log(self, msg):
         logTime = time.gmtime()
-        print(f"[{logTime[0]}-{logTime[1]}-{logTime[2]} {logTime[3]}:{logTime[4]}:{logTime[5]}] {msg}")
+        logEntry = f"[{logTime[0]}-{logTime[1]}-{logTime[2]} {logTime[3]}:{logTime[4]}:{logTime[5]}] {msg}"
+        print(logEntry)
+        self.sendMessage(self.logChannel, logEntry)
