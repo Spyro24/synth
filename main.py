@@ -59,6 +59,10 @@ class bot:
                         words = message.split(" ")
                         #if len(words) == 1 and words[0].lower() in self.autoResponseBeginns:
                         #    self.replyToMessage(packet["channel"], f"{words[0]} <@{packet['author']}>", packet["_id"])
+                        for word in words:
+                            if word.startswith("<@") and word.endswith(">"):
+                                if (not packet["author"] in self.stats["allTime"]["messagesFromMembers"]) or self.stats["allTime"]["messagesFromMembers"][packet["author"]] < 5:
+                                    self.kickUser(packet["author"], self.channelToServerResolve[packet["channel"]])
                         if len(message) > 0 and message[0] == "/":
                             self.log(f"{packet['author']} used '{message}'")
                             self.commandExecutor.execute(packet)
@@ -95,6 +99,9 @@ class bot:
     
     def bannUser(self, userID, serverID, reason=""):
         requests.put(f"https://stoat.chat/api/servers/{serverID}/bans/{userID}", headers={"X-Bot-Token": self.botToken}, json={"reason":reason,"delete_message_seconds":1200})
+    
+    def kickUser(self, userID, serverID, reason=""):
+        requests.delete(f"https://stoat.chat/api/servers/{serverID}/members/{userID}", headers={"X-Bot-Token": self.botToken})
     
     def loadStats(self):
         stats = {}
