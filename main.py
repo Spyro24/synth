@@ -23,6 +23,7 @@ class bot:
         self.userNameLookUpTable = {}
         self.autoResponseBeginns = {"hai","hello","hallo", "hey"}
         self.channelToServerResolve = dict()
+        self.userId = requests.get("https://stoat.chat/api/users/@me", headers={"X-Bot-Token": self.botToken}).json()["_id"]
         self.ready()
     
     def ready(self):
@@ -57,12 +58,17 @@ class bot:
                     continueFlag = False
                     packet = json.loads(packet)
                     if packet["type"] == "Message" and "content" in packet:
+                        print(packet)
+                        if packet["author"] == self.userId:
+                            continue
                         message: str = packet["content"].strip()
                         words = message.split(" ")
                         #if len(words) == 1 and words[0].lower() in self.autoResponseBeginns:
                         #    self.replyToMessage(packet["channel"], f"{words[0]} <@{packet['author']}>", packet["_id"])
                         for word in words:
                             if word.startswith("<@") and word.endswith(">"):
+                                if "member" in packet and "roles" in packet["member"]:
+                                    break
                                 if (not packet["author"] in self.stats["allTime"]["messagesFromMembers"]) or self.stats["allTime"]["messagesFromMembers"][packet["author"]] < 5:
                                     self.kickUser(packet["author"], self.channelToServerResolve[packet["channel"]])
                                     self.log(f"user <@{packet['author']}> auto kicked, prob a bot user, message: `{message}`")
