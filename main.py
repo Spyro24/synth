@@ -58,7 +58,6 @@ class bot:
                     continueFlag = False
                     packet = json.loads(packet)
                     if packet["type"] == "Message" and "content" in packet:
-                        print(packet)
                         if packet["author"] == self.userId:
                             continue
                         message: str = packet["content"].strip()
