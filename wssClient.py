@@ -25,8 +25,12 @@ class WSSClient:
             self.ws = websocket.WebSocketApp(self.url, on_message=on_message, on_open=on_open)
             self.ws.run_forever()
         
-        self.thread = threading.Thread(target=worker, daemon=True)
-        self.thread.start()
+        try:
+            self.ws = websocket.WebSocketApp(self.url, on_message=on_message, on_open=on_open)
+            self.ws.run_forever()
+        except BaseException as e:
+            print("websocket crashed")
+            print(e)
     
     def get_messages(self):
         with self.lock:
