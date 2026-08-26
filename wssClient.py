@@ -22,12 +22,10 @@ class WSSClient:
                 with self.lock:
                     self.connected = True
             
-            try:
-                self.ws = websocket.WebSocketApp(self.url, on_message=on_message, on_open=on_open)
-                self.ws.run_forever()
-            except BaseException as e:
-                print("websocket crashed")
-                print(e)
+        while True:
+            self.ws = websocket.WebSocketApp(self.url, on_message=on_message, on_open=on_open)
+            self.ws.run_forever()
+            self.ws = None
         
         self.thread = threading.Thread(target=worker, daemon=True)
         self.thread.start()
@@ -45,5 +43,3 @@ class WSSClient:
     def send_data(self, data):
         if self.ws:
             self.ws.send(data)
-        else:
-            raise RuntimeError("WebSocket connection not established")
