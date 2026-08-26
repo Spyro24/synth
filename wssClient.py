@@ -22,10 +22,10 @@ class WSSClient:
                 with self.lock:
                     self.connected = True
             
-        while True:
-            self.ws = websocket.WebSocketApp(self.url, on_message=on_message, on_open=on_open)
-            self.ws.run_forever()
-            self.ws = None
+            while True:
+                self.ws = websocket.WebSocketApp(self.url, on_message=on_message, on_open=on_open)
+                self.ws.run_forever()
+                self.ws = None
         
         self.thread = threading.Thread(target=worker, daemon=True)
         self.thread.start()
