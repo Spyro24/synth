@@ -4,6 +4,6 @@ def restart(args, bot, params: dict, helpStr=False):
     else:
         if params["author"] == params["env"]["ownerId"]:
             bot.sendMessage(params["channel"], "Restarting bot ...")
-            bot.restart()
+            bot.flags.add("restart")
         else:
             bot.sendMessage(params["channel"], "Missing Permisions")
