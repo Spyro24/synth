@@ -25,6 +25,7 @@ class bot:
         self.autoResponseBeginns = {"hai","hello","hallo", "hey"}
         self.channelToServerResolve = dict()
         self.userId = requests.get("https://stoat.chat/api/users/@me", headers={"X-Bot-Token": self.botToken}).json()["_id"]
+        self.flags = set()
         self.ready()
     
     def ready(self):
@@ -78,6 +79,10 @@ class bot:
                         if len(message) > 0 and message[0] == "/":
                             self.log(f"{packet['author']} used '{message}'")
                             self.commandExecutor.execute(packet)
+                            for flag in self.flags:
+                                match flag:
+                                    case "restart":
+                                        self.restart()
                         elif any(n in message for n in ("@​everyone", "@everyone")):
                             if not packet["author"] in self.stats["allTime"]["messagesFromMembers"]:
                                 self.bannUser(packet["author"], self.channelToServerResolve[packet["channel"]], "Pinging Everyone")
