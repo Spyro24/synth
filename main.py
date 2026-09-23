@@ -7,9 +7,10 @@ import synth.commands as commands
 import requests
 
 class bot:
-    def __init__(self, token):
+    def __init__(self, token, env = dict()):
         self.logChannel = "01KHDS86KVYX5KDWY6HEG730VY"
         self.botToken = token
+        self.env = env
         self.log("Starting Bot")
         #self.logFile = open(f"{}.log", "a")
         #self.logFile.write(encrypt_string_with_public_key("Logging start", self.logPublicKey) + "\n")
@@ -17,7 +18,7 @@ class bot:
         self.stats = {"allTime":{"messages": 0, "messagesFromMembers":{}}}
         self.websocket = wssClient.WSSClient(f"wss://stoat.chat/events?version=1&format=json&token={self.botToken}")
         self.commandExecutor = commands.commandExecutor(self)
-        self.backupScheduleSeconds = 60 * 30
+        self.backupScheduleSeconds = self.env[]
         self.lastBackup = time.time() + self.backupScheduleSeconds
         self.nextPing = 0
         self.userNameLookUpTable = {}
@@ -127,3 +128,10 @@ class bot:
         logEntry = f"[{logTime[0]}-{logTime[1]}-{logTime[2]} {logTime[3]}:{logTime[4]}:{logTime[5]}] {msg}"
         print(logEntry)
         self.sendMessage(self.logChannel, logEntry)
+    
+    def restart(self):
+        self.log("[Restart] Saving Stats")
+        with open("stats.json", "w", encoding="utf-8") as f:
+            json.dump(self.stats, f, ensure_ascii=False, indent=4)
+        self.log("[Restart] bot is restarting now ...")
+        exit(1)
