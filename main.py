@@ -134,4 +134,4 @@ class bot:
         with open("stats.json", "w", encoding="utf-8") as f:
             json.dump(self.stats, f, ensure_ascii=False, indent=4)
         self.log("[Restart] bot is restarting now ...")
-        exit(1)
+        raise BaseException("Restarting Bot")
