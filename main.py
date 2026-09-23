@@ -18,7 +18,7 @@ class bot:
         self.stats = {"allTime":{"messages": 0, "messagesFromMembers":{}}}
         self.websocket = wssClient.WSSClient(f"wss://stoat.chat/events?version=1&format=json&token={self.botToken}")
         self.commandExecutor = commands.commandExecutor(self)
-        self.backupScheduleSeconds = self.env[]
+        self.backupScheduleSeconds = self.env[statsBackupIntervall]
         self.lastBackup = time.time() + self.backupScheduleSeconds
         self.nextPing = 0
         self.userNameLookUpTable = {}
