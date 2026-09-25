@@ -7,7 +7,8 @@ class commandExecutor:
         self.commandTable = {"stats": forAll.stats,
                              "help": forAll.chelp,
                              "dice": forAll.dice,
-                             "restart": owner.restart}
+                             "restart": owner.restart.
+                             "forcestatssave": owner.forceStatsSave}
     
     def execute(self, packet):
         command: str = packet["content"].strip().strip("/").split(" ")
