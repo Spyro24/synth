@@ -1,3 +1,5 @@
+import json
+
 def restart(args, bot, params: dict, helpStr=False):
     if helpStr:
         return "`/restart` - restarts the bot"
